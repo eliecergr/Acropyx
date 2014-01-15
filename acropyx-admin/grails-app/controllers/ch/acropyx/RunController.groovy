@@ -114,6 +114,12 @@ class RunController {
         def runInstance = Run.get(params.id)
         if (runInstance) {
             try {
+
+                runInstance.flights.each { flight ->
+                    //delete flights
+                    flight.delete()
+                }
+
                 runInstance.delete(flush: true)
                 flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'run.label', default: 'Run'), params.id])}"
                 redirect(action: "list")
@@ -165,7 +171,7 @@ class RunController {
                 values.put(markCoefficient.markDefinition.name, roundMark(detailedResults.get(markCoefficient.id)))
             }
 
-            values.put('overall', roundMark(flight.computeResult(detailedResults)))
+            values.put('overall', roundMark(flight.calculateComputeResult(detailedResults)))
 
 
             csv << values

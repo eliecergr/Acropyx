@@ -112,7 +112,20 @@ class CompetitionController {
         if (competitionInstance) {
             Competition.withTransaction { status ->
                 try {
+
+                    Run.findAllByCompetition(competitionInstance).each {run ->
+                        //delete flights
+                        Flight.findAllByRun(run).each {flight ->
+                            flight.delete(flush: true)
+                        }
+                        //delete runs
+                        run.delete(flush: true)
+                    }
+
+
+                    //delete competition
                     competitionInstance.delete(flush: true)
+
                     flash.message = "${message(code: 'default.deleted.message', args: [message(code: 'competition.label', default: 'Competition'), params.id])}"
                     redirect(action: "list")
                 }

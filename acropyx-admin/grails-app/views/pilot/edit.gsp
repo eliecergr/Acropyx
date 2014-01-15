@@ -44,6 +44,15 @@
                                     <g:countrySelect name="country" value="${pilotInstance?.country}" default="che" />
                                 </td>
                             </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="sex"><g:message code="pilot.sex.label" default="Sex" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: pilotInstance, field: 'sex', 'errors')}">
+                                    <g:select name="sex" from="${ch.acropyx.Pilot$Sex?.values()}" keys="${ch.acropyx.Pilot$Sex?.values()*.name()}" value="${pilotInstance?.sex?.name()}"  />
+                                </td>
+                            </tr>
                         
                             <tr class="prop">
                                 <td valign="top" class="name">
@@ -121,6 +130,15 @@
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: pilotInstance, field: 'bestResult', 'errors')}">
                                     <g:textField name="bestResult" value="${pilotInstance?.bestResult}" />
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="licenceFAI"><g:message code="pilot.licenceFAI.label" default="FAI licence" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: pilotInstance, field: 'licenceFAI', 'errors')}">
+                                    <g:checkBox name="licenceFAI" checked="${pilotInstance?.licenceFAI?.booleanValue()}"/>
                                 </td>
                             </tr>
                         

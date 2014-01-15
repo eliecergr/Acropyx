@@ -1,10 +1,10 @@
 <div>
 
-    <div id="logo_box"></div>
-    <div id="result_flight_name">
+    <div class="logo_box"></div>
+    <div class="result_flight_name">
         {{html name}}
     </div>
-    <div id="logo_competition_box"></div>
+    <div class="logo_competition_box"></div>
 	
 	<div style="top:200px;left:10px;right:10px;height:200px;position:absolute;">
 		<canvas class="epyx_competitor_canvas" style="position:absolute;width:100%;height:100%;">
@@ -19,8 +19,18 @@
 	
 	<div class="rank" hidden="true">${rank}</div>
 	
-	<script type="text/javascript" > 
-		epyxRenderer.render();
+	<script type="text/javascript" >
+        var oldInterval = sessionStorage.getItem("rotateResultInterval");
+        if (oldInterval) {
+            window.clearInterval(oldInterval);
+        }
+
+        var oldRankingInterval = sessionStorage.getItem("rotateRankingInterval");
+        if (oldRankingInterval) {
+            window.clearInterval(oldRankingInterval);
+        }
+
+        epyxRenderer.render();
 		epyxPafAnimation.clear();
 		epyxMarkAnimation.start();
 		epyxMarkAnimation.registerOnFinish( function() { 

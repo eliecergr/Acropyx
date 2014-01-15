@@ -169,7 +169,7 @@ td.tete {
 }
 
 
-#result_flight_name {
+.result_flight_name {
 	vertical-align:middle;
 	z-index:2;
 	font-size:1.2em;
@@ -195,25 +195,27 @@ td.tete {
 	-webkit-transform: rotateZ(0deg);
 }
 
-#logo_box{
+.logo_box{
     z-index: 3;
     position: absolute;
     height:160px;
     top: 12px;
-    left:15px;
-    background: url(images/aerobatic_logo.png)  top left no-repeat transparent;
-    width: 156px;
+/*    left:15px;*/
+    left:5px;
+/*    background: url(images/aerobatic_logo.png)  top left no-repeat transparent;
+  */
+  width: 156px;
 }
 
-#logo_competition_box{
+.logo_competition_box{
     z-index: 3;
     position: absolute;
     height:160px;
     top:12px;
     right: 5px;
-    right: 15px;
+    /*right: 15px;*/
     background: url(images/competition_logo.png)  top right no-repeat transparent;
-    width: 160px;
+    width: 220px;
 }
 
 #logo_title_1{

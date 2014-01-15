@@ -164,8 +164,11 @@ var startup = function(userOptions, callback) {
 		controllerServer.post("/resultFlightSolo", controllerHandler('ResultFlightSolo'));
 		controllerServer.post("/resultFlightTeam", controllerHandler('ResultFlightTeam'));
 		controllerServer.post("/resultRun", controllerHandler('ResultRun'));
+	        controllerServer.post("/rotateResults", controllerHandler('RotateResults'));
+	        controllerServer.post("/rotateRanking", controllerHandler('RotateRanking'));
+        	controllerServer.post("/overallRanking", controllerHandler('OverallRanking'));
 		controllerServer.post("/startOrderRun", controllerHandler('StartOrderRun'));
-        controllerServer.post("/showSponsors", controllerHandler('ShowSponsors'));
+	        controllerServer.post("/showSponsors", controllerHandler('ShowSponsors'));
 		controllerServer.post("/waiting", controllerHandler('Waiting'));
 	
 		controllerServer.post("/paf", pafHandler);

@@ -9,26 +9,58 @@
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
             <span class="menuButton"><a class="admin" href="${createLink(uri: '/admin')}"><g:message code="default.admin.label"/></a></span>
             <span class="menuButton"><g:link class="list" action="exportCompetition" id="${competitionId}">Export</g:link></span>
+            <span class="menuButton"><g:link class="list" action="exportCompetitionFAI" id="${competitionId}">Export FAI Format </g:link></span>
+
             <g:if test="${isSolo}">
                 <span class="menuButton">
-
-                    <g:jasperReport class="list"  controller="resultCompetition" action="reportCompetitionResults"  jasper="competitionresults" format="PDF" name="PDF" height="16" delimiterAfter=" " delimiterBefore=" ">
+                    <g:jasperReport class="list"  controller="resultCompetition" action="reportCompetitionResults"  jasper="competitionresults" format="PDF" name="PDF Solo" height="16" delimiterAfter=" " delimiterBefore=" ">
                         <input type="hidden" name="competition_id" value="${competitionId}"/>
                         <input type="hidden" name="ACROPYX_COMPETITION" value="TEST"/>
                         <input type="hidden" name="ACROPYX_RESULT" value="RESULTS"/>
+                    </g:jasperReport>
+                </span>
+                <span class="menuButton">
+                    <g:jasperReport class="list"  controller="resultCompetition" action="reportCompetitionResultsCompensation"  jasper="competitionresults" format="PDF" name="PDF Solo - FAI" height="16" delimiterAfter=" " delimiterBefore=" ">
+                        <input type="hidden" name="competition_id" value="${competitionId}"/>
+                        <input type="hidden" name="ACROPYX_COMPETITION" value="TEST"/>
+                        <input type="hidden" name="ACROPYX_RESULT" value="RESULTS"/>
+                    </g:jasperReport>
+                </span>
+                <span class="menuButton">
+                    <g:jasperReport class="list"  controller="resultCompetition" action="reportRankingSolo"  jasper="ranking" format="PDF" name="APWC Ranking Solo" height="16" delimiterAfter=" " delimiterBefore=" ">
+                        <input type="hidden" name="ACROPYX_RANKING" value="APWC Ranking Solo"/>
+                        <input type="hidden" name="ACROPYX_RANKING_TITLE" value="Overall results "/>
                     </g:jasperReport>
                 </span>
             </g:if>
             <g:else>
                 <span class="menuButton">
-                    <g:jasperReport class="list"  controller="resultCompetition" action="reportCompetitionResults"  jasper="competitionresultsSync" format="PDF" name="PDF sync" height="16" delimiterAfter=" " delimiterBefore=" " >
+                    <g:jasperReport class="list"  controller="resultCompetition" action="reportCompetitionResults"  jasper="competitionresultsSync" format="PDF" name="PDF Sync" height="16" delimiterAfter=" " delimiterBefore=" " >
                         <input type="hidden" name="competition_id" value="${competitionId}"/>
                         <input type="hidden" name="ACROPYX_COMPETITION" value="TEST"/>
                         <input type="hidden" name="ACROPYX_RESULT" value="RESULTS"/>
                     </g:jasperReport>
                 </span>
+                <span class="menuButton">
+                    <g:jasperReport class="list"  controller="resultCompetition" action="reportCompetitionResultsCompensation"  jasper="competitionresultsSync" format="PDF" name="PDF Sync - FAI" height="16" delimiterAfter=" " delimiterBefore=" " >
+                        <input type="hidden" name="competition_id" value="${competitionId}"/>
+                        <input type="hidden" name="ACROPYX_COMPETITION" value="TEST"/>
+                        <input type="hidden" name="ACROPYX_RESULT" value="RESULTS"/>
+                    </g:jasperReport>
+                </span>
+                <span class="menuButton">
+                    <g:jasperReport class="list"  controller="resultCompetition" action="reportRankingSync"  jasper="rankingSync" format="PDF" name="APWC Ranking Synchro" height="16" delimiterAfter=" " delimiterBefore=" ">
+                        <input type="hidden" name="ACROPYX_RANKING" value="APWC Ranking Synchro"/>
+                        <input type="hidden" name="ACROPYX_RANKING_TITLE" value="Overall results "/>
+
+                    </g:jasperReport>
+                </span>
+
 
             </g:else>
+
+
+
             <sec:ifNotLoggedIn>
                 <span class="menuLogin"><a class="login" href="${createLink(uri: '/login')}"><g:message code="default.login.label"/></a></span>
             </sec:ifNotLoggedIn>

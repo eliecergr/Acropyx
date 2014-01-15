@@ -161,4 +161,10 @@ class PilotController {
             redirect(action: "show", id: params.pilot.id)
         }
     }
+
+    @Secured(['ROLE_ADMIN'])
+    def updateCivlPilotList = {
+        //Get List from civl WebService
+        redirect(action: list)
+    }
 }

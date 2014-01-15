@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="run-results" language="groovy" printOrder="Horizontal" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="29e04439-0e80-4611-bc91-2cca9c174b6e">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="22"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="ACROPYX_COMPETITION" class="java.lang.String"/>
 	<parameter name="ACROPYX_RESULT" class="java.lang.String"/>
 	<parameter name="ACROPYX_RUN_TITLE_1" class="java.lang.String"/>
@@ -12,6 +12,7 @@
 	<parameter name="ACROPYX_RUN_TITLE_5" class="java.lang.String"/>
 	<parameter name="ACROPYX_RUN_TITLE_6" class="java.lang.String"/>
 	<parameter name="ACROPYX_RUN_TITLE_7" class="java.lang.String"/>
+	<parameter name="ACROPYX_COMPENSATION_NOTE" class="java.lang.String"/>
 	<field name="rank" class="java.lang.String"/>
 	<field name="competitor" class="java.lang.String"/>
 	<field name="r1" class="java.lang.String"/>
@@ -25,6 +26,13 @@
 	<field name="r6" class="java.lang.String"/>
 	<field name="r7" class="java.lang.String"/>
 	<field name="Warnings" class="java.lang.String"/>
+	<field name="note_r1" class="java.lang.String"/>
+	<field name="note_r2" class="java.lang.String"/>
+	<field name="note_r3" class="java.lang.String"/>
+	<field name="note_r4" class="java.lang.String"/>
+	<field name="note_r5" class="java.lang.String"/>
+	<field name="note_r6" class="java.lang.String"/>
+	<field name="note_r7" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -45,7 +53,7 @@
 				<reportElement uuid="338900e8-a211-40d3-84da-ec0c8627d0b7" x="639" y="0" width="100" height="33"/>
 				<imageExpression><![CDATA["/home/acropyx/Acropyx/acropyx-admin/web-app/reports/acropyx_logo_100.png"]]></imageExpression>
 			</image>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="32bbb51d-bfec-4212-9a5a-b334b160314b" x="148" y="27" width="477" height="23"/>
 				<textElement textAlignment="Center">
 					<font size="16" isBold="true"/>
@@ -56,7 +64,7 @@
 	</title>
 	<pageHeader>
 		<band height="32" splitType="Stretch">
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="f15dc37a-8397-47f6-9dc1-304c2f431447" x="8" y="12" width="156" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
@@ -158,17 +166,17 @@
 			<line>
 				<reportElement uuid="fbd82a19-8c4d-4c11-9314-e6b0b35a457e" x="2" y="0" width="732" height="1"/>
 			</line>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="c62e8c42-14d0-49cb-b855-e3d4505b675e" x="-2" y="4" width="24" height="20"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{rank}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="524fb11a-63bd-4e0f-911b-d72ac7570bca" x="45" y="4" width="113" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{competitor}]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.0">
+			<textField pattern="###0.0" isBlankWhenNull="true">
 				<reportElement uuid="67a38189-d5bf-4876-bad4-9afc6dad5ccd" x="690" y="4" width="38" height="20"/>
 				<textElement textAlignment="Right">
 					<font isBold="false"/>
@@ -220,10 +228,46 @@
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{r6}]]></textFieldExpression>
 			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="50f85aaf-cf98-48a6-a067-6c30a4caa4ba" x="375" y="2" width="16" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{note_r1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="84c51080-551a-4d3d-bd6c-6979ecaa08d4" x="428" y="2" width="16" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{note_r2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="1b2bfe7c-9fe8-4f02-924c-0052f04e9e07" x="481" y="2" width="16" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{note_r3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="28c02055-c85f-42dc-9d3d-7a3d942d6706" x="534" y="2" width="16" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{note_r4}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="0a708183-7b1f-4a39-829e-d2579ef1b3a4" x="587" y="2" width="16" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{note_r5}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="311be319-d54a-489e-b522-8b0673a15449" x="640" y="2" width="16" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{note_r6}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="17" splitType="Stretch"/>
+		<band height="24" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="596bf5ec-e5ee-44e9-b0f6-7f0f6e15bc4f" x="0" y="4" width="219" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$P{ACROPYX_COMPENSATION_NOTE}]]></textFieldExpression>
+			</textField>
+		</band>
 	</columnFooter>
 	<pageFooter>
 		<band height="20" splitType="Stretch">

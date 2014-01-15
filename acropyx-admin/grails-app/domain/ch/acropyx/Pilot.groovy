@@ -27,6 +27,9 @@ import org.springframework.web.context.request.RequestContextHolder
 @MultiTenant
 class Pilot extends Competitor {
     private static final Logger log = Logger.getLogger(Pilot.class.getName())
+    static enum Sex {
+        Male, Female
+    }
 
     // Injected MessageSource service
     def messageSource
@@ -41,6 +44,8 @@ class Pilot extends Competitor {
     String sponsor
     Integer civlRank
     Integer civlId
+    Sex sex
+    Boolean licenceFAI
 
 
     static constraints = {
@@ -55,6 +60,13 @@ class Pilot extends Competitor {
         civlRank(nullable:true)
         civlId(nullable:true)
         picture(nullable:true, maxSize:5000000)
+        sex(nullable: true)
+        licenceFAI(nullable: true)
+    }
+
+    static mapping = {
+        sex (defaultValue: Sex.Male)
+        licenceFAI(defaultValue: true)
     }
 
     static transients = ["age"]
@@ -117,7 +129,7 @@ class Pilot extends Competitor {
                         sponsor:fields[8],
                         bestResult:fields[9],
                         civlRank: fields[10]
-                        )
+                )
                 try {
                     pilot.save(failOnError: true, flush: true)
                 } catch (Exception e) {
@@ -179,24 +191,24 @@ class Pilot extends Competitor {
         def result = ''
         if ( flyingSinceYear ) {
             Object[] args = [
-                sprintf('%d', flyingSinceYear)
+                    sprintf('%d', flyingSinceYear)
             ]
             result = ',"flyingSince" : "' + messageSource.getMessage( 'displayer.pilot.flyingSince', args, Locale.default ) + '"'
         }
         result
     }
-        def String addSponsor() {
+    def String addSponsor() {
         def result = ''
         if ( sponsor ) {
             Object[] args = [
-                sponsor
+                    sponsor
             ]
             result = ',"sponsor" : "' + messageSource.getMessage( 'displayer.pilot.sponsor', args, Locale.default ) + '"'
         }
         result
     }
 
-   def String addCivlRank() {
+    def String addCivlRank() {
         def result = ''
         if ( civlRank ) {
             Object[] args = [
@@ -217,7 +229,7 @@ class Pilot extends Competitor {
         }
         result
     }
-    
+
     def String addTicker() {
         def result = ',"ticker" : "'
         if ( job || glider || sponsor || bestResult || flyingSinceYear ) {
@@ -225,11 +237,11 @@ class Pilot extends Competitor {
             if ( job ) {
                 result += addSeparator() + messageSource.getMessage( 'displayer.ticker.job', [job]as Object[], Locale.default )
             }
-            
+
             if ( civlRank ) {
                 result +=  addSeparator() + messageSource.getMessage( 'displayer.ticker.civlRank', [civlRank]as Object[], Locale.default )
             }
-            
+
             if ( glider ) {
                 result += addSeparator() + messageSource.getMessage( 'displayer.ticker.glider', [glider]as Object[], Locale.default )
             }
@@ -241,7 +253,7 @@ class Pilot extends Competitor {
             }
             if ( flyingSinceYear ) {
                 result += addSeparator() + messageSource.getMessage( 'displayer.ticker.flyingSince', [
-                    sprintf('%d', flyingSinceYear)]
+                        sprintf('%d', flyingSinceYear)]
                 as Object[], Locale.default )
             }
         }
@@ -256,8 +268,7 @@ class Pilot extends Competitor {
         "http://" + serverName + ":" + serverPort + "/pilot/displayPicture/" + id
     }
 
-    def String buildDefaultImgSrc()
-    {
+    def String buildDefaultImgSrc(){
         def serverName = RequestContextHolder.currentRequestAttributes().getRequest().getServerName()
         def serverPort = RequestContextHolder.currentRequestAttributes().getRequest().getServerPort()
         "http://" + serverName + ":" + serverPort + "/pilot/displayPicture/0"
@@ -265,6 +276,5 @@ class Pilot extends Competitor {
     def String toCountryISO3166_1() {
         country.substring( 0, 3 )
     }
-    
-    
+
 }

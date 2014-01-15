@@ -78,7 +78,7 @@
                             
                             <td valign="top" style="text-align: left;" class="value">
                                 <% def detailedResults = flightInstance.computeDetailedResults() %>
-                                <g:formatNumber number="${flightInstance.computeResult(detailedResults)}" format="#.#" roundingMode="HALF_UP" />
+                                <g:formatNumber number="${flightInstance.calculateComputeResult(detailedResults)}" format="#.#" roundingMode="HALF_UP" />
                                 {<g:each in="${detailedResults}" var="detailResult">
                                     ${MarkCoefficient.get(detailResult.key).markDefinition}:<g:formatNumber number="${detailResult.value}" format="#.#" roundingMode="HALF_UP" />,
                                 </g:each>}

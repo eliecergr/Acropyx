@@ -34,6 +34,8 @@ class Flight {
     List manoeuvres
     int warnings
 
+    double computeResult
+
     static hasMany = [manoeuvres: Manoeuvre, marks: Mark]
 
     static constraints = {
@@ -42,6 +44,7 @@ class Flight {
         startTime(nullable: true, format: ConfigurationHolder.config.ch.acropyx.dateFormat)
         endTime(nullable: true, format: ConfigurationHolder.config.ch.acropyx.dateFormat)
         warnings(range:0..3)
+        computeResult(nullable: true)
     }
 
     static transients = ["active", "ended"]
@@ -79,6 +82,8 @@ class Flight {
             throw new RuntimeException("Flight '${this}' is already terminated");
         }
         endTime = new Date();
+        // CHECK!!!!!
+        computeFlightResult(true);
     }
 
     def addWarning() {
@@ -86,6 +91,7 @@ class Flight {
         if (warnings > 3) {
             warnings = 3;
         }
+	computeFlightResult(isEnded())
     }
 
     def removeWarning() {
@@ -93,6 +99,7 @@ class Flight {
         if (warnings < 0) {
             warnings = 0;
         }
+	computeFlightResult(isEnded())
     }
 
     def Map computeDetailedResults() {
@@ -102,17 +109,11 @@ class Flight {
         def FAIs = competition.judges.findAll { it.role == Judge.Role.FAI }
         def VIPs = competition.judges.findAll { it.role == Judge.Role.VIP }
 
-        def manoeuvresSum = 0.0d
-        manoeuvres.each() { manoeuvre ->
-            manoeuvresSum += manoeuvre.coefficient
-        }
         def manoeuvresMean = 0.0d
-        if ( manoeuvres.size() > 0 ) {
-            manoeuvresMean = manoeuvresSum / manoeuvres.size()
-        }
+        manoeuvresMean = calculateManoeuvresMean()
 
         def detailedResults = [:]
-        markCoefficients.each() { markCoefficient ->
+        markCoefficients.each {markCoefficient ->
             def markDefinition = markCoefficient.markDefinition
 
             // FAI judges
@@ -150,10 +151,25 @@ class Flight {
                 mark = FAIMark * 0.8d + VIPMark * 0.2d
             } else if (FAIs.size() > 0) {
                 mark = FAIMark
-            }  else if (VIPs.size() > 0) {
+            } else if (VIPs.size() > 0) {
                 mark = VIPMark
             } else {
                 mark = 0d
+            }
+
+            //discount 10% peer duplicate manoeuvers
+
+
+            if ((markDefinition.name == "Choreography") &&
+                    (run.penality != 0)) {
+                def duplicateManoeuvres = DuplicateManoeuvreCount()
+
+                mark = mark * (100 - duplicateManoeuvres * run.penality) / 100
+
+                if (mark < 0) {
+                    mark = 0
+                }
+
             }
 
             detailedResults.put(markCoefficient.id, mark)
@@ -162,8 +178,114 @@ class Flight {
         return detailedResults
     }
 
-    def double computeResult(Map detailedResults) {
-        def sum = 0d
+Integer DuplicateManoeuvreCount() {
+        int duplicateManoeuvres = 0
+        if (this.manoeuvres.size() > 0){
+            def competition = run.competition
+            def List<Manoeuvre> manoeuvreList = []
+            if (competition != null){
+                for (currentRun in competition.runs) {
+                    if ((currentRun as Run).isEnded() && run.startTime > (currentRun as Run).startTime){
+                        for (flight in  (currentRun as Run).flights ){
+                            if (flight.competitor.id == this.competitor.id && flight.endTime < this.startTime){
+                                manoeuvreList.addAll(flight.manoeuvres)
+                            }
+                        }
+                    }
+                }
+            }
+            def Map  currentFlightManoeuvres = [:]
+            for (int i=0 ; i < this.manoeuvres.size(); i++) {
+              Manoeuvre m = this.manoeuvres.get(i) as Manoeuvre;
+              def Boolean duplicateManoeuvre;
+             // if(allowDuplicate(m)){
+             //    def count = 0;
+             //    manoeuvreList.each {mano->
+             //        if(mano.name == m.name){
+             //            count++;
+             //        }
+             //    }
+             //     duplicateManoeuvre = (count > 2);
+             //  }
+
+             // else{
+            //   duplicateManoeuvre = manoeuvreList.contains(m)
+             // }
+              duplicateManoeuvre = (!allowDuplicate(m) && manoeuvreList.contains(m))
+              def Boolean currentDuplicateManoeuvre =  currentFlightManoeuvres.containsKey(m.id)
+              if ( (currentDuplicateManoeuvre && !duplicateManoeuvre) ||
+                   (!currentDuplicateManoeuvre && duplicateManoeuvre)){
+                  duplicateManoeuvres++
+              }
+                currentFlightManoeuvres.put(m.id, m)
+            }
+        }
+        return duplicateManoeuvres
+    }
+
+    def boolean allowDuplicate(Manoeuvre mano){
+        if (mano.name == 'DYN. FULL STALL') return true;
+        if (mano.name == 'FULL STALL') return true;
+        if (mano.name == 'PITCH PENDULUM') return true;
+        if (mano.name == 'TAIL SLIDE') return true;
+
+        return false;
+    }
+
+/*
+    Integer DuplicateManoeuvreCount() {
+
+
+        int duplicateManoeuvres = 0
+
+        def competition = run.competition
+
+        if (competition != null){
+            //Find duplicate manoeuvres in previous runs
+            for (currentRun in competition.runs) {
+                if ((currentRun as Run).isEnded() && run.startTime > (currentRun as Run).startTime){
+                    for (flight in  (currentRun as Run).flights ){
+                        if (flight.competitor.id == this.competitor.id && flight.endTime < this.startTime){
+                            manoeuvres.each() { manoeuvre ->
+                                if (flight.manoeuvres.contains(manoeuvre)) {
+                                    duplicateManoeuvres++
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (this.manoeuvres.size() > 0){
+                def Map  map = [:]
+                //Find duplicate manoeuvres in the current run
+                for (int i=0 ; i < this.manoeuvres.size(); i++) {
+                  Manoeuvre m = this.manoeuvres.get(i) as Manoeuvre;
+                  map.put(m.id, m.id)
+                }
+
+                duplicateManoeuvres += this.manoeuvres.size() - map.size()
+            }
+
+
+
+
+        }
+
+        return duplicateManoeuvres
+
+    }
+
+*/
+    def double computeFlightResult(boolean recalculate) {
+       if (recalculate || computeResult == null || computeResult == 0){
+         computeResult =  calculateComputeResult(computeDetailedResults())
+       }
+       return computeResult
+    }
+
+    def double calculateComputeResult(Map detailedResults){
+         def sum = 0d
         detailedResults.each { key, value ->
             def markCoefficient = MarkCoefficient.get(key)
             sum += value * markCoefficient.coefficient
@@ -179,10 +301,42 @@ class Flight {
             sum = 0;
         }
 
-        return (sum > 0 ? sum : 0)
+        computeResult = (sum > 0 ? sum : 0)
+
+        return computeResult
     }
 
     def String toString() {
         return sprintf('%s - %s', competitor?.name, run.toString());
     }
+
+    def double calculateManoeuvresMean(){
+        def firstManoeuvre = 0.0d
+        def secondManoeuvre = 0.0d
+        def thirdManoeuvre = 0.0d
+
+        manoeuvres.each() { manoeuvre ->
+            if (manoeuvre.coefficient > thirdManoeuvre){
+                if(manoeuvre.coefficient > secondManoeuvre){
+                    if(manoeuvre.coefficient > firstManoeuvre){
+                        thirdManoeuvre = secondManoeuvre
+                        secondManoeuvre= firstManoeuvre
+                        firstManoeuvre = manoeuvre.coefficient
+                    }
+                    else{
+                        thirdManoeuvre = secondManoeuvre
+                        secondManoeuvre = manoeuvre.coefficient
+                    }
+                }
+                else{
+                    thirdManoeuvre = manoeuvre.coefficient
+                }
+            }
+        }
+
+        return (firstManoeuvre + secondManoeuvre + thirdManoeuvre) / 3
+
+    }
+
+
 }

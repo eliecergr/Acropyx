@@ -119,7 +119,7 @@ class DisplayerService {
         def json = '{ "name" : "' + name + '", "' + (isPilot ? 'competitor' : 'team' ) + '" : ' + competitor.toJSON()
         def detailedResults = flight.computeDetailedResults()
         json += ', "marks" : ' + generateDetailedResults(detailedResults)
-        json += ', "overall" : { "kind" : "TOTAL POINTS", "value" : "' + roundResult(flight.computeResult(detailedResults)) + '"}'
+        json += ', "overall" : { "kind" : "TOTAL POINTS", "value" : "' + roundResult(flight.calculateComputeResult(detailedResults)) + '"}'
         json += ', "warnings" : ' + flight.warnings
         json += ', "rank" : "' + generateRank(flight) + '."}'
         def resp = restClient.post( path : (isPilot ? 'resultFlightSolo' : 'resultFlightTeam'),
@@ -128,10 +128,10 @@ class DisplayerService {
                 headers : ["Tenant": tenant] )
 
 
-        if (showResult){
-            sleep(20000)
-            resultRun(tenant, flight.run)
-        }
+        //if (showResult){
+        //    sleep(20000)
+         //   resultRun(tenant, flight.run)
+       // }
 
 
     }
@@ -156,11 +156,7 @@ class DisplayerService {
 
     def void resultCompetition(String tenant, Competition competition) {
         if (competition) {
-            def msgKey = (competition.endTime ? 'displayer.result.competition.final.text' : 'displayer.result.competition.intermediate.text')
-            def subTitle = messageSource.getMessage( msgKey, []as Object[], Locale.default )
-            Object[] args = [competition.name, subTitle]
-            def name = messageSource.getMessage( 'displayer.competition_end.title', args, Locale.default )
-            def json = '{ "name" : "' + name + '", "competitors" : ' + generateCompetitionResult(competition) + '}'
+            def json = generateAllCompetitionData(competition);
             def resp = restClient.post( path : 'resultRun',
                     body : json,
                     requestContentType : ContentType.JSON,
@@ -232,7 +228,7 @@ class DisplayerService {
         def endedFlights = run.findEndedFlights(true)
 
         endedFlights.eachWithIndex { flight, i ->
-            json += '{ "name" : "' + flight.competitor.name + '", "warnings" : '  + flight.warnings + ', "mark" : "' + roundResult(flight.computeResult(flight.computeDetailedResults()))    + '"'
+            json += '{ "name" : "' + flight.competitor.name + '", "warnings" : '  + flight.warnings + ', "mark" : "' + roundResult(flight.computeFlightResult(false))    + '"'
             if ( flight.competitor instanceof Pilot ) {
                 json += ', "country" : "' + flight.competitor.toCountryISO3166_1() + '"'
             }
@@ -262,7 +258,21 @@ class DisplayerService {
         def results = competition.computeResults()
 
         results.eachWithIndex { result, i ->
-            json += '{ "name" : "' + result.competitor.name + '", "warnings" : '  + result.warnings + ', "nbRuns" : ' + result.flights.size() + ', "mark" : "' + roundResult(result.overall) + '"'
+
+            //Check if the competitor is DSQ
+            def countWarnings = 0
+            if( result.overall == 0 ){
+                competition.findEndedRuns().each { endedRun ->
+                   countWarnings += Flight.findByCompetitorAndRun(result.competitor, endedRun).warnings
+                }
+            }
+			def isDSQ = 0
+			if (countWarnings >= 3){
+			   isDSQ = 1
+			}
+
+           json += '{ "name" : "' + result.competitor.name + '", "warnings" : '  + result.warnings + ', "isDSQ" : ' + isDSQ + ', "nbRuns" : ' + result.flights.size() + ', "mark" : "' + roundResult(result.overall) + '"'
+			 
             if (result.competitor instanceof Pilot) {
                 json += ', "country" : "' + result.competitor.toCountryISO3166_1() + '"'
             }
@@ -338,5 +348,206 @@ class DisplayerService {
                 requestContentType : ContentType.JSON,
                 headers : ["Tenant": tenant] )
     }
+
+    def void rotateResults(String tenant, competition1, competition2){
+
+//        def json = '{ "competition1" : ' + generateAllCompetitionData(competition1)  + ','
+//                      'competition2": "' + generateAllCompetitionData(competition2)  + '}'
+
+        if (competition1 && competition2) {
+            def msgKey1 = (competition1.endTime ? 'displayer.result.competition.final.text' : 'displayer.result.competition.intermediate.text')
+            def subTitle1 = messageSource.getMessage( msgKey1, []as Object[], Locale.default )
+            Object[] args1 = [competition1.name, subTitle1]
+            def name1 = messageSource.getMessage( 'displayer.competition_end.title', args1, Locale.default )
+
+            def msgKey2 = (competition2.endTime ? 'displayer.result.competition.final.text' : 'displayer.result.competition.intermediate.text')
+            def subTitle2 = messageSource.getMessage( msgKey2, []as Object[], Locale.default )
+            Object[] args2 = [competition2.name, subTitle2]
+            def name2 = messageSource.getMessage( 'displayer.competition_end.title', args2, Locale.default )
+
+
+            def json = '{ "competition1": {"name" : "' + name1 + '", "competitors": ' + generateCompetitionResult(competition1)  + '}, "competition2": {"name" : "' + name2 + '", "competitors" :' + generateCompetitionResult(competition2)  +   '}  }'
+            def resp = restClient.post( path : 'rotateResults',
+                body : json,
+                requestContentType : ContentType.JSON,
+                headers : ["Tenant": tenant] )
+        }
+    }
+
+    //TODO: Add DATE!!!!
+    def void overallRanking(String tenant, type){
+        def json = ''
+        if ( type == Competition.Type.Solo){
+            json = generateSoloRankingData()
+        }
+        else{
+            json = generateSyncRankingData()
+        }
+        def resp = restClient.post( path : 'overallRanking',
+                body : json,
+                requestContentType : ContentType.JSON,
+                headers : ["Tenant": tenant] )
+    }
+
+    def void rotateOverallRanking(String tenant){
+        def json = '{ "ranking1":' + generateSoloRankingData() + ', "ranking2":' + generateSyncRankingData() + '}'
+        def resp = restClient.post( path : 'rotateRanking',
+                body : json,
+                requestContentType : ContentType.JSON,
+                headers : ["Tenant": tenant] )
+    }
+
+
+    def String generateAllCompetitionData(Competition competition)
+    {
+        def json = '{}';
+        if (competition) {
+            def msgKey = (competition.endTime ? 'displayer.result.competition.final.text' : 'displayer.result.competition.intermediate.text')
+            def subTitle = messageSource.getMessage( msgKey, []as Object[], Locale.default )
+            Object[] args = [competition.name, subTitle]
+            def name = messageSource.getMessage( 'displayer.competition_end.title', args, Locale.default )
+            json = '{ "name" : "' + name + '", "competitors" : ' + generateCompetitionResult(competition) + '}'
+        }
+
+        return json;
+    }
+
+
+    def String generateSoloRankingData(){
+
+        def countRun = countRankingRuns(Competition.Type.Solo)
+        //TODO: Move to Messages
+        def name = 'APWC 2013 Solo <br /> Overall ranking after ' + countRun + ' run'
+
+        if (countRun > 1){
+            name += 's'
+        }
+
+        Map results = computePilotsRanking(countRun)
+
+        return '{ "name" : "' + name + '", "competitors" : ' + generateRankingData(results) + '}'
+    }
+
+    def String generateSyncRankingData()
+    {
+        def countRun = countRankingRuns(Competition.Type.Synchro)
+        //TODO: Move to Messages
+        def name = 'APWC Synchro 2013 <br /> Overall ranking after ' + countRun + ' run'
+        if (countRun > 1){
+            name += 's'
+        }
+
+        Map results = computeTeamsRanking(countRun)
+
+        return '{ "name" : "' + name + '", "competitors" : ' + generateRankingData(results) + '}'
+    }
+    //TODO: Add DATE!!!!
+    def String generateRankingData(Map ranking){
+
+        def String json = '['
+
+        ranking.eachWithIndex { result, i ->
+            json += '{ "name" : "' + (result.key as Competitor).name + '",  "mark" : "' + roundResult(result.value) + '"'
+            if (result.key  instanceof Pilot) {
+                json += ', "country" : "' + (result.key as Pilot).toCountryISO3166_1() + '"'
+            }
+            else{
+                def team = result.key as Team
+                def pilots  = team.pilots.toList()
+                def pilot1 = pilots.get(0)
+                def pilot2 = pilots.get(1)
+
+                if (pilot1.name.size() > pilot2.name.size())
+                {
+                    json += ', "pilot1" : "' + pilot1.name + '"'
+                    json += ', "pilot2" : "' + pilot2.name + '"'
+                    json += ', "country1" : "' + pilot1.toCountryISO3166_1() + '"'
+                    json += ', "country2" : "' + pilot2.toCountryISO3166_1() + '"'
+                }else{
+                    json += ', "pilot1" : "' + pilot2.name + '"'
+                    json += ', "pilot2" : "' + pilot1.name + '"'
+                    json += ', "country1" : "' + pilot2.toCountryISO3166_1() + '"'
+                    json += ', "country2" : "' + pilot1.toCountryISO3166_1() + '"'
+                }
+
+            }
+
+            json += '}'
+            if (i < ranking.size() -1) {
+                json += ','
+            }
+        }
+        json += ']'
+    }
+
+    //TODO: Add DATE!!!!
+   def Map computePilotsRanking (countRuns){
+       def ranking  = [:];
+       Pilot.listOrderById().each { pilot ->
+           def points = 0
+           def runs = 0
+           Flight.findAllByCompetitorAndEndTimeIsNotNull(pilot).each {flight ->
+               if (flight.run.isEnded()  && flight.run.competition.isAPWC){
+                   points += flight.computeFlightResult(false)
+                   runs++
+               }
+           }
+
+           if (runs < countRuns){
+               points += addCompensation(pilot)
+           }
+
+           if (points > 0){
+            ranking.put(pilot, points)
+           }
+       }
+       return ranking.sort {-it.value}
+   }
+
+    //TODO: Add DATE!!!!
+    def Map computeTeamsRanking (countRuns){
+        def ranking  = [:];
+        Team.listOrderById().each { team ->
+            def points = 0
+            def runs = 0
+            Flight.findAllByCompetitorAndEndTimeIsNotNull(team).each {flight ->
+                if (flight.run.isEnded() && flight.run.competition.isAPWC){
+                    points += flight.computeFlightResult(false)
+                    runs++
+                }
+            }
+
+            if (runs < countRuns){
+                points += addCompensation(team)
+            }
+            if (points > 0){
+                ranking.put(team, points)
+            }
+        }
+        return ranking.sort {-it.value}
+    }
+
+    def int countRankingRuns(type){
+        def runs = 0
+        Run.findAllByEndTimeIsNotNull().each{ run ->
+            if (run.competition.isAPWC && run.competition.type == type ){
+                runs++;
+            }
+        }
+        return runs;
+    }
+
+    def  double addCompensation(Competitor competitor){
+        def points = 0;
+        Competition.findByIsAPWCAndEndTimeIsNotNull(true).each {competition->
+            points += (competition as Competition).computeCompetitorCompensation(competitor)
+
+        }
+
+        return points;
+    }
+
+
+
 
 }

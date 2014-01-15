@@ -86,6 +86,11 @@ class VoteController {
         {
            return redirect(controller: "flightManoeuvre", action: "edit", id: flightInstance.id, params: [goHome: "1"])
         }
+        else{
+            //Recalculate Flight result
+            flightInstance.computeFlightResult(flightInstance.isEnded())
+        }
+
 
         if (params.goHome != null)// && params.goHome == 1)
         {

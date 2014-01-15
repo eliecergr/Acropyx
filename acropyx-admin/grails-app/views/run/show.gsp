@@ -49,6 +49,12 @@
                             <td valign="top" class="value">${fieldValue(bean: runInstance, field: "name")}</td>
                             
                         </tr>
+			<tr class="prop">
+                            <td valign="top" class="name"><g:message code="run.penality.label" default="Penality(%)" /></td>
+
+                            <td valign="top" class="value">${fieldValue(bean: runInstance, field: "penality")}</td>
+
+                        </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="run.startTime.label" default="Start Time" /></td>

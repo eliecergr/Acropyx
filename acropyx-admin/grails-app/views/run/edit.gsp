@@ -44,6 +44,15 @@
                                     <g:textField name="name" value="${runInstance?.name}" />
                                 </td>
                             </tr>
+
+			    <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="name"><g:message code="run.penality.label" default="Penality(%)"/></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: runInstance, field: 'name', 'errors')}">
+                                    <g:textField name="penality" value="${runInstance?.penality}" />
+                                </td>
+                            </tr>
                         
                             <tr class="prop">
                                 <td valign="top" class="name">

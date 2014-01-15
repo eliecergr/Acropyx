@@ -38,7 +38,7 @@ class ResultRunController {
         def isSolo = (runInstance.competition.type  == Competition.Type.Solo)
         if (params.notEndedFlights) {
             flights = runInstance.flights.sort { flight ->
-                flight.computeResult(flight.computeDetailedResults())
+                flight.computeFlightResult(false)
             }.reverse()
         }
         else {
@@ -144,7 +144,7 @@ class ResultRunController {
                 fields.add("Warnings")
                 labels["Warnings"] = "Warnings"
             }
-            expanded_record["Result"] =  roundMark(flight.computeResult(detailedResults))
+            expanded_record["Result"] =  roundMark(flight.calculateComputeResult(detailedResults))
             if (!fields.contains("Result")){
                 fields.add("Result")
                 labels["Result"] = "Result"
@@ -160,8 +160,51 @@ class ResultRunController {
         params.ACROPYX_COMPETITION = runInstance.competition.name
         params.ACROPYX_RUN = "Run: " + runInstance.name
         //TODO: change text for constants
-        params.ACROPYX_RESULT = (runInstance.isEnded())? "Final overall ranking": "Intermediate overall results"
+        params.ACROPYX_RESULT = (runInstance.isEnded())? "Final ranking": "Intermediate ranking"
         chain(controller:'jasper',action:'index',model:[data:resultList],params:params)
+    }
+
+    def reportRunManoeuvres = {
+        def run = Run.list()
+        def runInstance = Run.get(params.run_id)
+
+        def flights = runInstance.findEndedFlights(true)
+        def labels = [:]
+        def fields = []
+
+        def manoeuvreList = []
+
+        flights.eachWithIndex { flight, i ->
+            def expanded_record = [:]
+
+            expanded_record["competitor"] =  flight.competitor.name
+            if (!fields.contains("competitor")){
+                fields.add("competitor")
+                labels["competitor"] = "Competitor"
+            }
+
+            def manoeuvres = ""
+            flight.manoeuvres.each {mano ->
+                if (manoeuvres == ""){
+                    manoeuvres = (mano as Manoeuvre).name
+                }
+                else{
+                    manoeuvres += " - " + (mano as Manoeuvre).name
+                }
+            }
+
+            expanded_record["manoeuvres"] =  manoeuvres
+            if (!fields.contains("manoeuvres")){
+                fields.add("manoeuvres")
+                labels["manoeuvres"] = "Manoeuvres"
+            }
+
+            manoeuvreList.add expanded_record
+        }
+
+        params.ACROPYX_COMPETITION = runInstance.competition.name
+        params.ACROPYX_RUN = "Run: " + runInstance.name
+        chain(controller:'jasper',action:'index',model:[data:manoeuvreList],params:params)
     }
 
     def  roundMark(mark) {

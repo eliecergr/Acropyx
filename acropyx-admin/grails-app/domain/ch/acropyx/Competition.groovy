@@ -32,10 +32,13 @@ class Competition {
     Type type
     Date startTime
     Date endTime
+    Boolean isAPWC
 
     SortedSet markCoefficients
     SortedSet judges
     SortedSet runs
+
+
 
     static hasMany = [
         markCoefficients: MarkCoefficient,
@@ -51,6 +54,7 @@ class Competition {
         startTime(nullable: true, format: ConfigurationHolder.config.ch.acropyx.dateFormat)
         endTime(nullable: true, format: ConfigurationHolder.config.ch.acropyx.dateFormat)
         runs()
+        isAPWC(nullable: true)
 
         markCoefficients(validator: { coefficients ->
             if (coefficients) {
@@ -65,6 +69,10 @@ class Competition {
             return true
         }
         )
+    }
+
+    static mapping = {
+        isAPWC(defaultValue: true)
     }
 
     static transients = ["active", "ended"]
@@ -112,7 +120,7 @@ class Competition {
     def findEndedRuns() {
         return runs.findAll { it.isEnded() }.sort(it.endTime);
     }
-    
+
    // def findFirstRun() {
    //     return runs.sortBystartTime()[0]
    // }
@@ -174,7 +182,9 @@ class Competition {
                 competitorResult.competitor = flight.competitor
                 def flightResult = [:]
                 flightResult.id = flight.id
-                flightResult.result = flight.computeResult(flight.computeDetailedResults())
+                //flightResult.result = flight.computeResult(flight.computeDetailedResults())
+                flightResult.result = flight.computeFlightResult(false)
+
                 competitorResult.flights.put(endedRun.id, flightResult)
 
                 if (!competitorResult.overall) {
@@ -186,8 +196,9 @@ class Competition {
                     competitorResult.warnings = 0d
                 }
                 competitorResult.warnings = competitorResult.warnings + flight.warnings
+
                 if (competitorResult.warnings >= 3) {
-                    competitorResult.overall = 0d
+                    competitorResult.overall =   0d
                 }
             }
         }
@@ -195,4 +206,58 @@ class Competition {
         // Sort by rank (overall mark)
         return competitorResults.sort { it.overall }.reverse()
     }
+
+
+    def double computeCompetitorResult(Competitor competitor){
+        def points = 0
+        Run.findAllByCompetitionAndEndTimeIsNotNull(this).each { run ->
+            def flight = Flight.findByRunAndCompetitor(run, competitor)
+            if (flight != null){
+                points += flight.computeFlightResult(false)
+            }
+        }
+        return points
+    }
+
+
+    def int countFlights(Competitor competitor){
+        int count = 0
+        runs.each {run ->
+            if (Flight.findByCompetitorAndRun(competitor, run) != null){
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    def double computeCompetitorAverageResult(Competitor competitor){
+        def count = this.countFlights(competitor);
+        if (count > 0 ){
+            return   computeCompetitorResult(competitor)/ count  //Run.countByCompetitionAndEndTimeIsNotNull(this)
+        }
+
+        return 0;
+    }
+
+    def double computeCompetitorCompensation(Competitor competitor){
+        def points = 0
+        Run.findAllByCompetitionAndEndTimeIsNotNull(this).each { run ->
+            points += (run as Run).calculateCompetitorCompensation(competitor)
+        }
+        return points
+    }
+
+    def double computeCompetitorResultWithCompensation(Competitor competitor){
+
+        def compensation =   computeCompetitorCompensation(competitor)
+        def competitorResult = computeCompetitorResult(competitor)
+
+        return competitorResult +  compensation
+    }
+
+
+
+
+
 }

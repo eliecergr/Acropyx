@@ -1,9 +1,9 @@
 <div>
-    <div id="logo_box"></div>
-    <div id="result_flight_name">
+    <div class="logo_box"></div>
+    <div class="result_flight_name">
         {{html name}}
     </div>
-    <div id="logo_competition_box"></div>
+    <div class="logo_competition_box"></div>
 	
 	<div style="top:185px;left:0px;right:0px;height:60%;position:absolute;">
 		<canvas class="epyx_team_canvas" style="position:absolute;width:100%;height:100%;">
@@ -32,7 +32,18 @@
 		</canvas>
 	</div>
 	<script type="text/javascript" >
-		epyxBanner.changed();
+        var oldInterval = sessionStorage.getItem("rotateResultInterval");
+        if (oldInterval) {
+            window.clearInterval(oldInterval);
+        }
+
+        var oldRankingInterval = sessionStorage.getItem("rotateRankingInterval");
+        if (oldRankingInterval) {
+            window.clearInterval(oldRankingInterval);
+        }
+
+
+        epyxBanner.changed();
 		epyxPafAnimation.clear();
 		epyxRenderer.render();
 	</script>

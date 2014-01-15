@@ -380,8 +380,59 @@ class EventController {
         redirect(action: "home")
     }
 
-    def sendSponsorsToDisplay ={
+    def sendSponsorsToDisplay = {
         displayerService.showSponsors(getTenantName())
         redirect(action: "home")
     }
+
+    def sendEventCompetitionsResultsToDisplay = {
+        def competition1 = Competition.get(params.competition1id)
+        def competition2 = Competition.get(params.competition2id)
+
+//
+//        List<Competition> competitionList = Competition.findAllByStartTimeIsNotNullAndEndTimeIsNull([sort:'startTime',order:'asc']);
+//
+//        def competition1
+//        def competition2
+//
+//        if (competitionList.size() > 1){
+//
+//            competition1 = competitionList.get(0);
+//            competition2 = competitionList.get(1);
+//
+//        }
+//        else{
+//            competitionList = Competition.findAllByStartTimeIsNotNullAndEndTimeIsNotNull([sort:'endTime',order:'asc']);
+//            competition1 = competitionList.get(0);
+//            competition2 = competitionList.get(1);
+//        }
+
+        if (competition1 != null && competition2 != null){
+            displayerService.rotateResults(getTenantName(), competition1, competition2)
+        }
+        else {
+             flash.displayResults = "Please select the competitions"
+        }
+
+
+        redirect(action: "home")
+    }
+
+    def sendSoloOverAllResultsToDisplay = {
+        displayerService.overallRanking(getTenantName(), Competition.Type.Solo)
+        redirect(action: "home")
+    }
+
+    def sendSyncOverAllResultsToDisplay = {
+        displayerService.overallRanking(getTenantName(), Competition.Type.Synchro)
+        redirect(action: "home")
+    }
+
+    def sendRotateOverAllResultsToDisplay = {
+        displayerService.rotateOverallRanking(getTenantName())
+        redirect(action: "home")
+    }
+
+
+
 }

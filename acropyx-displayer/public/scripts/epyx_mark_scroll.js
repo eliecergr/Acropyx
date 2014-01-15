@@ -338,7 +338,12 @@ var epyxMarkTableScroll = function() {
 		context.fillStyle = fontColor;
 		context.font = "bold 30pt arial";
 		context.textAlign = "right";
-        if (row.mark == 0 ){
+
+       //FIX ERROR: when mark compute 0 show wrong DSQ
+//        if (row.mark == 0 ){
+//            context.fillText("DSQ", x+w-10, textLineY);
+//        }
+        if (row.isDSQ == 1 ){
             context.fillText("DSQ", x+w-10, textLineY);
         }
         else{

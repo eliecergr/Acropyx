@@ -388,45 +388,86 @@
                   </tr> -->
                   <tr>
                       <td>  
-                        <p style="color:#666; font-weight:bold">Display results</p>
+                        <p style="color:#666; font-weight:bold; margin-bottom: 5px;">Display results</p>
                         <g:if test="${flash.displayResults}">
                             <div class="errors">
                                 ${flash.displayResults}
                             </div>
                         </g:if>
-                        <div>
-                            <g:form action="sendCompetitionResultToDisplay">
-                                <g:select name="id"
-                                        from="${ch.acropyx.Competition.findAllByStartTimeIsNotNull()}"
-                                        optionKey="id" value="${activeCompetition?.id}"
-                                        noSelection="['': '-- Choose a competition --']" />
-                                <g:submitButton name="Send competition result to display" />
-                            </g:form>
-                        </div>                        
-                        <div>
-                            <g:form action="sendRunResultToDisplay">
-                                <g:select name="id"
-                                        from="${ch.acropyx.Run.findAllByStartTimeIsNotNull()}"
-                                        optionKey="id" value="${activeRun?.id}"
-                                        noSelection="['': '-- Choose a run --']" />
-                                <g:submitButton name="Send run result to display" />
-                            </g:form>
+                        <div id="admin-display-result">
+                            <div class="option-box">
+                                <g:form action="sendCompetitionResultToDisplay">
+                                    <g:select name="id"
+                                            from="${ch.acropyx.Competition.findAllByStartTimeIsNotNull()}"
+                                            optionKey="id" value="${activeCompetition?.id}"
+                                            noSelection="['': '-- Choose a competition --']" />
+                                    <g:submitButton name="Send competition result to display" />
+                                </g:form>
+                            </div>
+                            <div  class="option-box">
+                                <g:form action="sendRunResultToDisplay">
+                                    <g:select name="id"
+                                            from="${ch.acropyx.Run.findAllByStartTimeIsNotNull()}"
+                                            optionKey="id" value="${activeRun?.id}"
+                                            noSelection="['': '-- Choose a run --']" />
+                                    <g:submitButton name="Send run result to display" />
+                                </g:form>
+                            </div>
+                            <div  class="option-box separator">
+                                <g:form action="sendFlightToDisplay">
+                                    <g:select name="id"
+                                            from="${ch.acropyx.Flight.findAllByStartTimeIsNotNull(sort:'startTime', order:'desc')}"
+                                            optionKey="id" value="${activeFlight?.id}" noSelection="['': '-- Choose a flight --']"
+                                            />
+                                    <g:submitButton name="Send flight to display" />
+                                </g:form>
+                             </div>
+
+                            <div class="option-box separator">
+                                <g:form action="sendEventCompetitionsResultsToDisplay">
+                                    <g:select name="competition1id"
+                                              from="${ch.acropyx.Competition.findAllByStartTimeIsNotNull(sort:'startTime', order:'desc')}"
+                                              optionKey="id" value="${activeCompetition?.id}" noSelection="['': '-- Choose a competition --']"
+                                    />
+                                    <g:select name="competition2id"
+                                              from="${ch.acropyx.Competition.findAllByStartTimeIsNotNull(sort:'startTime', order:'desc')}"
+                                              optionKey="id" value="${activeCompetition?.id}" noSelection="['': '-- Choose a competition --']"
+                                    />
+                                    <br/>
+                                    <g:submitButton name="Rotate active competitions" />
+                                </g:form>
+                            </div>
+
+                            <div class="option-box">
+                                <div style=" float:left; margin-right: 10px;">
+                                    <g:form action="sendSoloOverAllResultsToDisplay">    <!--SOLO -->
+                                        <g:submitButton name="Display APWC Solo overall ranking" />
+                                    </g:form>
+                                </div>
+
+                                <div style=" float:left; margin-right: 10px;">
+                                    <g:form action="sendSyncOverAllResultsToDisplay">    <!--SYNC -->
+                                        <g:submitButton name="Display APWC Synchro overall ranking" />
+                                    </g:form>
+                                </div>
+
+                                <div style="clear: both;"></div>
+                            </div>
+
+                            <div  class="option-box separator">
+                                <g:form action="sendRotateOverAllResultsToDisplay">
+                                    <g:submitButton name="Rotate APWC Solo and Synchro overall rankings" />
+                                </g:form>
+                            </div>
+                            <br />
+                            <div >
+                                <g:form action="sendSponsorsToDisplay">
+                                    <g:submitButton name="Display Competition Image" />
+                                </g:form>
+                            </div>
                         </div>
-                        <div>
-                            <g:form action="sendFlightToDisplay">
-                                <g:select name="id"
-                                        from="${ch.acropyx.Flight.findAllByStartTimeIsNotNull(sort:'startTime', order:'desc')}"
-                                        optionKey="id" value="${activeFlight?.id}" noSelection="['': '-- Choose a flight --']" 
-                                        
-                                        />
-                                <g:submitButton name="Send flight to display" />
-                            </g:form>
-                        </div>
-                          <div>
-                              <g:form action="sendSponsorsToDisplay">
-                                  <g:submitButton name="Competition Logo to display" />
-                              </g:form>
-                          </div>
+
+
                     </td>
                 </tr>
             </table>        

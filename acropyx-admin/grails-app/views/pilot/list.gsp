@@ -28,6 +28,8 @@
                             <g:sortableColumn property="country" title="${message(code: 'pilot.country.label', default: 'Country')}" />
                         
                             <g:sortableColumn property="age" title="${message(code: 'pilot.age.label', default: 'Age')}" />
+
+                            <g:sortableColumn property="sex" title="${message(code: 'pilot.sex.label', default: 'Sex')}" />
                         
                             <g:sortableColumn property="flyingSinceYear" title="${message(code: 'pilot.flyingSinceYear.label', default: 'Flying Since Year')}" />
                         
@@ -48,6 +50,8 @@
                             <td><g:country code="${pilotInstance.country}" /></td>
                         
                             <td>${fieldValue(bean: pilotInstance, field: "age")}</td>
+
+                            <td>${fieldValue(bean: pilotInstance, field: "sex")}</td>
                         
                             <td>${fieldValue(bean: pilotInstance, field: "flyingSinceYear")}</td>
                         

@@ -52,6 +52,13 @@
                             <td valign="top" class="value"><g:country code="${pilotInstance.country}" /></td>
                             
                         </tr>
+
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="pilot.sex.label" default="Sex" /></td>
+
+                            <td valign="top" class="value">${pilotInstance.sex?.encodeAsHTML()}</td>
+
+                        </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="pilot.age.label" default="Age" /></td>
@@ -101,7 +108,14 @@
                             <td valign="top" class="value">${fieldValue(bean: pilotInstance, field: "bestResult")}</td>
                             
                         </tr>
-                    
+
+                        <tr class="prop">
+                            <td valign="top" class="name"><g:message code="pilot.licenceFAI.label" default="FAI licence" /></td>
+
+                            <td valign="top" class="value">${fieldValue(bean: pilotInstance, field: "licenceFAI")}</td>
+
+                        </tr>
+
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="pilot.picture.label" default="Picture" /></td>
                             <td valign="top" class="value">

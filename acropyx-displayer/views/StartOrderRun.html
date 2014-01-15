@@ -1,9 +1,9 @@
 <div>
-    <div id="logo_box"></div>
-    <div id="result_flight_name">
+    <div class="logo_box"></div>
+    <div class="result_flight_name">
         <span>{{html name}}</span>
     </div>
-    <div id="logo_competition_box"></div>
+    <div class="logo_competition_box"></div>
 	
 	<div id="mark_table_result">
 		<canvas id="epyx_scrolling_table" style="width:100%;position:absolute;">
@@ -12,7 +12,18 @@
 	</div>
 	<div style="position:absolute;bottom:0px;height:1px"></div>
 	<script type="text/javascript">
-		epyxPafAnimation.clear();
+        var oldInterval = sessionStorage.getItem("rotateResultInterval");
+        if (oldInterval) {
+            window.clearInterval(oldInterval);
+        }
+
+        var oldRankingInterval = sessionStorage.getItem("rotateRankingInterval");
+        if (oldRankingInterval) {
+            window.clearInterval(oldRankingInterval);
+        }
+
+
+        epyxPafAnimation.clear();
 		epyxMarkTableScroll.start();
 	</script>
 </div>

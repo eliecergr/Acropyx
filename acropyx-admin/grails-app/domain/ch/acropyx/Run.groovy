@@ -25,19 +25,44 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 @MultiTenant
 class Run implements Comparable {
 
+    static enum Type {
+        Standard,Battle
+    }
+
     String name
     Date startTime
     Date endTime
+    int penality = 0
+
+//    Type type = Type.Standard
+//
+//    boolean isElimination
+//    int qualifiedByRank1 //FAI
+//    int qualifiedByRank2 //ACRO
+//    int qualifiedForNextRun
 
     Competition competition
     static hasMany = [ flights : Flight ]
+    static belongsTo = [Competition]
 
     static constraints = {
         competition(blank:false)
         name(blank: false)
         startTime(nullable: true, format: ConfigurationHolder.config.ch.acropyx.dateFormat)
         endTime(nullable: true, format: ConfigurationHolder.config.ch.acropyx.dateFormat)
+        penality()
+//        type() //(nullable: true)      //change - add default value to Standard
+//        qualifiedByRank1()
     }
+
+//    static mapping = {
+//        type defaultValue: 'Standard'
+//        isElimination(defaultValue: false)
+//        qualifiedByRank1(defaultValue: 0)
+//        qualifiedByRank2(defaultValue: 0)
+//        qualifiedForNextRun(defaultValue : 0)
+//
+//    }
 
     def int compareTo(Object object) {
         return id.compareTo(object.id);
@@ -89,7 +114,7 @@ class Run implements Comparable {
 
         if (sortByResult) {
             return endedFlights.sort { flight ->
-                flight.computeResult(flight.computeDetailedResults())
+                flight.computeFlightResult(false)
             }.reverse()
         }
 
@@ -110,7 +135,34 @@ class Run implements Comparable {
 
         return pilots;
     }
-    
+
+    //Ranking
+    def double minFlightPoints(){
+        def minPoints = 100000
+
+        flights.each { flight ->
+            def points = flight.computeFlightResult(false)
+            if (points < minPoints){
+                minPoints = points
+            }
+        }
+
+        return minPoints
+    }
+
+    //Return 0 if run is not ended ()
+    def double calculateCompetitorCompensation(Competitor competitor){
+        if (this.isEnded() && Flight.findByRunAndCompetitor(this, competitor) == null){
+            def averageResult = competition.computeCompetitorAverageResult(competitor);
+            if (averageResult > 0){
+                    return Math.min(averageResult, minFlightPoints())
+            }
+        }
+
+        return 0;
+    }
+
+
     def String toString() {
         sprintf("%s:%s", competition?.code, name);
     }

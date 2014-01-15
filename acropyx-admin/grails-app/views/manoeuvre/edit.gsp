@@ -44,6 +44,15 @@
                                     <g:textField name="coefficient" value="${fieldValue(bean: manoeuvreInstance, field: 'coefficient')}" />
                                 </td>
                             </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="groupId"><g:message code="manoeuvre.group.label" default="Group No" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: manoeuvreInstance, field: 'groupId', 'errors')}">
+                                    <g:textField name="groupId" value="${fieldValue(bean: manoeuvreInstance, field: 'groupId')}" />
+                                </td>
+                            </tr>
                         
                         </tbody>
                     </table>

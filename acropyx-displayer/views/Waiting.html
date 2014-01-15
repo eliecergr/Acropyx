@@ -1,10 +1,10 @@
 <div style="width:100%;height:100%;">
 
-    <div id="logo_box"></div>
-    <div id="result_flight_name">
+    <div class="logo_box"></div>
+    <div class="result_flight_name">
         <span>{{html name}}</span>
     </div>
-    <div id="logo_competition_box"></div>
+    <div class="logo_competition_box"></div>
 	
 	
 	<canvas id="epyx_banner" fontSize="50" style="width:100%;height:60px;bottom:100px;left:0px">
@@ -19,7 +19,18 @@
 		<img class="footer_img" style="position:absolute;right:1px;height:100%;" src="images/acropyx_logo_100.png"></img>
 	</div>
 	<script type="text/javascript">
-		epyxPafAnimation.clear();
+        var oldInterval = sessionStorage.getItem("rotateResultInterval");
+        if (oldInterval) {
+            window.clearInterval(oldInterval);
+        }
+
+        var oldRankingInterval = sessionStorage.getItem("rotateRankingInterval");
+        if (oldRankingInterval) {
+            window.clearInterval(oldRankingInterval);
+        }
+
+
+        epyxPafAnimation.clear();
 		epyxBanner.changed();
 	</script>
 </div>

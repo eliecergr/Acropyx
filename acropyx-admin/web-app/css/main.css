@@ -337,3 +337,13 @@ th.desc a {
     font-size: 10px;
 	text-decoration:none;
 }
+
+
+#admin-display-result .option-box{
+   padding-bottom: 2px;
+   margin-bottom: 8px;
+}
+
+#admin-display-result .separator{
+    border-bottom: 1px solid #CCCCCC;
+}

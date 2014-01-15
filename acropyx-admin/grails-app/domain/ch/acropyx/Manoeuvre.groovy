@@ -26,10 +26,16 @@ class Manoeuvre {
 
     String name
     float coefficient
+    int groupId
 
     static constraints = {
         name(blank: false)
         coefficient()
+        groupId()
+    }
+
+    static mapping = {
+        groupId(defaultValue: 100)
     }
 
     def String toString() {
@@ -52,7 +58,8 @@ class Manoeuvre {
         removeAll();
         inputStream.toCsvReader(['charset':'UTF-8']).eachLine() { fields ->
             if (fields?.length > 1) {
-                def manoeuvre = new Manoeuvre(name:fields[0], coefficient:fields[1])
+                //def manoeuvre = new Manoeuvre(name:fields[0], coefficient:fields[1])
+                def manoeuvre = new Manoeuvre(id:(fields[0] as int) +100 , name:fields[1], coefficient:fields[2], group: fields[3])
                 try {
                     manoeuvre.save(failOnError: true, flush: true)
                 }

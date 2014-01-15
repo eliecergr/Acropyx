@@ -11,6 +11,18 @@
             <span class="menuButton"><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></span>
             <span class="menuButton"><a class="admin" href="${createLink(uri: '/admin')}"><g:message code="default.admin.label"/></a></span>
             <span class="menuButton"><g:link class="list" controller="run" action="export" id="${runInstance.id}">Export CSV</g:link></span>
+
+            <span class="menuButton">
+                <g:jasperReport class="list" controller="resultRun" action="reportRunManoeuvres"  jasper="runmanoeuvres" format="PDF" name="Manoeuvres PDF" height="16" delimiterBefore=" " delimiterAfter=" " >
+                    <input type="hidden" name="run_id" value="${runInstance.id}"/>
+                    <input type="hidden" name="ACROPYX_COMPETITION" value="TEST"/>
+                    <input type="hidden" name="ACROPYX_RUN" value="RUN1"/>
+                    <input type="hidden" name="ACROPYX_RESULT" value="RESULTS"/>
+                </g:jasperReport>
+            </span>
+
+
+
             <g:if test="${isSolo}">
                 <span class="menuButton">
                     <g:jasperReport class="list" controller="resultRun" action="reportRunResults"  jasper="runresults" format="PDF" name="Export PDF" height="16" delimiterBefore=" " delimiterAfter=" " >
@@ -31,9 +43,6 @@
                     </g:jasperReport>
                 </span>
             </g:else>
-
-
-
 
         %{--<span class="menuButton"><a class="list"  id="${runInstance.id}" onclick="">Export to PDF</a></span>--}%
             <sec:ifNotLoggedIn>
@@ -84,7 +93,7 @@
 
                             <td>${flight.warnings}</td>
                             
-                            <% def result = flight.computeResult(detailedResults) %>
+                            <% def result = flight.calculateComputeResult(detailedResults) %>
                             <td style="text-align: right;"><g:link controller="flight" action="show" id="${flight.id}"><g:formatNumber number="${result}" format="0.000" roundingMode="HALF_UP" /></g:link></td>
                         </tr>
                     </g:each>

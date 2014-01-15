@@ -22,9 +22,120 @@
 		        padding: 2px;
 		        float: left;
 		        width: 100px;
-		        height: 30px;
+		        height: 35px;
 		        text-align: center;
+                border: 1px solid #000000;
+                font-weight: bold;
 		    }
+
+            .g1{
+                background-color: #48802c;
+            }
+
+            .g2{
+                background-color: #fbd850;
+            }
+
+            .g3{
+                background-color: #999999;
+            }
+
+            .g4{
+                background-color: #ffe4c4;
+            }
+
+            .g5{
+                background-color: #4169e1;
+            }
+
+            .g6{
+                background-color: #b2d1ff;;
+            }
+
+            .g7{
+                background-color: #f6a828;
+            }
+
+            .g8{
+                background-color: #ffaaaa;
+            }
+
+            .g9{
+                background-color: #7fff00;
+            }
+
+            .g10{
+                background-color: #ff1493;
+            }
+
+            .g11{
+                background-color: #f0e68c;
+            }
+
+            .g12{
+                background-color: #ff8c00;
+            }
+
+            .g13{
+                background-color: #cd5c5c;
+            }
+
+            .g14{
+                background-color: #1e90ff;
+            }
+            .g15{
+                background-color: #8fbc8f;
+            }
+
+            .g16{
+                background-color: #f0e68c;
+            }
+
+            .g17{
+                background-color: #d3d3d3;
+            }
+
+            .g18{
+                background-color: #20b2aa;
+            }
+
+            .g19{
+                background-color: #ff69b4;
+            }
+
+            .g20{
+                background-color: #daa520;
+            }
+
+            .g21{
+                background-color: #adff2f;
+            }
+
+             .g22{
+                background-color: #ff7f50;
+            }
+
+            .g23{
+                background-color: #00ffff;
+            }
+
+            .g24{
+                background-color: #dc143c;
+            }
+
+            .g25{
+                background-color: #008b8b;
+            }
+
+            .g26{
+                background-color: #d2691e;
+            }
+
+            .g100{
+                background-color: #add8e6;
+            }
+
+
 		    #flight {
 		        list-style-type: none;
 		        margin: 0;
@@ -62,11 +173,11 @@
 		    $(document).ready(function() {
 		        $( '.manoeuvre' ).draggable({
 		            connectToSortable: "#flight",
-		            helper: "clone",
+		            helper: "clone"
 		        }).disableSelection();
 		        $( '#flight' ).sortable({
                     connectWith: '#trash',
-                    dropOnEmpty: true,
+                    dropOnEmpty: true
                 }).disableSelection();
                 $( '#trash' ).sortable({
                     tolerance: 'pointer',
@@ -80,7 +191,7 @@
                     },
                     out: function(event, ui) {
                         this.style.backgroundImage = "url('../../images/trash-closed-64x75.png')";    
-                    },
+                    }
                 }).disableSelection();
                 var manoeuvreClick = function(event) {
                     var self = event.currentTarget;
@@ -121,9 +232,9 @@
                 <tr>
                     <td>
 		                <h1>Manoeuvres list</h1>
-						<ul id="manoeuvres" style="width: 800px; padding:5px; border: 1px solid #ccc;">
+						<ul id="manoeuvres" style="width: 700px; padding:5px; border: 1px solid #ccc;">
 						    <g:each in="${manoeuvres}" status="i" var="manoeuvre">
-							    <li class="manoeuvre ui-state-highlight">
+							    <li class="manoeuvre  ${'g'+ manoeuvre.groupId}">
 							    <input type="hidden" name="flightManoeuvreIds" value="${manoeuvre.id}" />${manoeuvre}</li>
 						    </g:each>
 						</ul>
@@ -136,9 +247,12 @@
 						    <tr>
 								<td>
 									<h1>${flightInstance}</h1>
-									<ul id="flight" style="width:112px; min-height: 100px; padding:5px; border: 1px solid #ccc;">
+                                    <br />
+                                    <button onclick="$('#btnSave').click();"> Save </button>
+                                    <br />
+									<ul id="flight" style="width:570px; min-height: 100px; padding:5px; border: 1px solid #ccc;">
 										<g:each in="${flightManoeuvres}" status="i" var="manoeuvre">
-	                                        <li class="sortable ui-state-highlight">
+	                                        <li class="sortable  ${'g'+ manoeuvre.groupId}">
 	                                        <input type="hidden" name="flightManoeuvreIds" value="${manoeuvre.id}" />${manoeuvre}</li>
 	                                    </g:each>
 									</ul>
@@ -149,7 +263,7 @@
                         <g:if test="${goHome}">
                             <input type="hidden" id="goHome" name="goHome" value="${goHome}"/>
                         </g:if>
-					    <g:submitButton name="Save" />
+					    <g:submitButton name="Save" id="btnSave" />
                         </g:form>  				    
 				    </td>	    
                 </tr> 

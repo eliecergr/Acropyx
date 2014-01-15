@@ -97,10 +97,12 @@ environments {
             resolver.type = "request"
             resolver.request.dns.type = "config"
             domainTenantMap = [:]
-            domainTenantMap.put("epyx.acropyx.com", 1)
-            domainTenantMap.put("gilles.acropyx.com", 2)
-            domainTenantMap.put("claudio.acropyx.com", 3)
-            domainTenantMap.put("cs2011.acropyx.com", 4)
+//            domainTenantMap.put("46.38.243.67", 1)
+            domainTenantMap.put("acropyx.com", 1)
+            //domainTenantMap.put("epyx.acropyx.com", 1)
+            //domainTenantMap.put("gilles.acropyx.com", 2)
+            //domainTenantMap.put("claudio.acropyx.com", 3)
+            //domainTenantMap.put("cs2011.acropyx.com", 4)
             //domainTenantMap.put("admin.acropyx.com",5)
             //domainTenantMap.put("displayer.acropyx.com",5)
         }
@@ -111,8 +113,9 @@ environments {
             resolver.type = "request"
             resolver.request.dns.type = "config"
             domainTenantMap = [:]
-            domainTenantMap.put("test1.localhost", 1)
-            domainTenantMap.put("test2.localhost", 2)
+           // domainTenantMap.put("46.38.243.67", 1)
+            domainTenantMap.put("acropyx.com", 1)
+         //   domainTenantMap.put("test2.localhost", 3)
             //domainTenantMap.put("displayer.acropyx.com",1)
             
         }
